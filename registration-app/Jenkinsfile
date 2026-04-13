@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_DIR = "/var/lib/jenkins/workspace/registration-app-job"
+        DOCKER_CONFIG = '/var/lib/jenkins/.docker'
     }
 
     stages {
@@ -23,32 +23,43 @@ pipeline {
                 sh '''
                 pwd
                 ls -la
+                ls -la registration-app
                 '''
             }
         }
 
         stage('Stop Old Containers') {
             steps {
-                sh '''
-                docker compose down || true
-                '''
+                dir('registration-app') {
+                    sh '''
+                    pwd
+                    ls -la
+                    docker compose down || true
+                    '''
+                }
             }
         }
 
         stage('Build and Start Containers') {
             steps {
-                sh '''
-                docker compose up -d --build
-                '''
+                dir('registration-app') {
+                    sh '''
+                    pwd
+                    ls -la
+                    docker compose up -d --build
+                    '''
+                }
             }
         }
 
         stage('Verify Running Containers') {
             steps {
-                sh '''
-                docker ps
-                docker compose ps
-                '''
+                dir('registration-app') {
+                    sh '''
+                    docker ps
+                    docker compose ps
+                    '''
+                }
             }
         }
     }
