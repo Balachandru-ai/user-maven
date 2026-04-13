@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_DIR = "/var/lib/jenkins/workspace/registration-app-job"
+    }
+
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Balachandru-ai/user-maven.git'
+            }
+        }
+
+        stage('Show Files') {
+            steps {
+                sh '''
+                pwd
+                ls -la
+                '''
+            }
+        }
+
+        stage('Stop Old Containers') {
+            steps {
+                sh '''
+                docker compose down || true
+                '''
+            }
+        }
+
+        stage('Build and Start Containers') {
+            steps {
+                sh '''
+                docker compose up -d --build
+                '''
+            }
+        }
+
+        stage('Verify Running Containers') {
+            steps {
+                sh '''
+                docker ps
+                docker compose ps
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment completed successfully'
+        }
+        failure {
+            echo 'Deployment failed'
+        }
+    }
+}
