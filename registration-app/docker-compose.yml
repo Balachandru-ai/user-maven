@@ -29,6 +29,14 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/registration_db?createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root123
-
+  prometheus:
+     image: prom/prometheus
+     container_name: prometheus
+     ports:
+       - "9090:9090"
+     volumes:
+       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+     depends_on:
+       - registration-app 
 volumes:
   mysql_data:
