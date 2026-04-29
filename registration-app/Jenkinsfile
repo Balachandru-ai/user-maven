@@ -2,7 +2,7 @@ pipeline {
     agent { label 'linux' }
 
     environment {
-        DOCKER_CONFIG = '/var/lib/jenkins/.docker'
+        DOCKER_CONFIG = '/home/ec2-user/.docker'
     }
 
     stages {
