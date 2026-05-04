@@ -6,6 +6,7 @@ pipeline {
     }
 
     stages {
+
         stage('Clean Workspace') {
             steps {
                 cleanWs()
@@ -31,45 +32,40 @@ pipeline {
         stage('Stop Old Containers') {
             steps {
                 dir('registration-app') {
-                    sh '''
-                    pwd
-                    ls -la
-                    docker compose down || true
-                    '''
+                    sh 'docker compose down || true'
                 }
             }
         }
 
-        stage('Build and Start Containers') {
+        stage('Pull Latest Image') {
+            steps {
+                sh 'docker pull balachandru1/registration-app:latest'
+            }
+        }
+
+        stage('Start Containers') {
             steps {
                 dir('registration-app') {
-                    sh '''
-                    pwd
-                    ls -la
-                    docker compose up -d --build
-                    '''
+                    sh 'docker compose up -d'
                 }
             }
         }
 
         stage('Verify Running Containers') {
             steps {
-                dir('registration-app') {
-                    sh '''
-                    docker ps
-                    docker compose ps
-                    '''
-                }
+                sh '''
+                docker ps
+                '''
             }
         }
     }
 
     post {
         success {
-            echo 'Deployment completed successfully'
+            echo '✅ Deployment completed successfully'
         }
         failure {
-            echo 'Deployment failed'
+            echo '❌ Deployment failed'
         }
     }
 }
