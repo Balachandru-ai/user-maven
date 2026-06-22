@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_CONFIG = '/home/ec2-user/.docker'
-        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/libexec/docker/cli-plugins:$PATH"
+        PATH = "/usr/bin:/usr/local/bin:$PATH"
     }
 
     stages {
@@ -30,6 +30,16 @@ pipeline {
             }
         }
 
+        stage('Check Docker') {
+            steps {
+                sh '''
+                docker --version
+                docker compose version
+                whoami
+                '''
+            }
+        }
+
         stage('Stop Old Containers') {
             steps {
                 dir('registration-app') {
@@ -42,7 +52,9 @@ pipeline {
 
         stage('Pull Latest Image') {
             steps {
-                sh 'docker pull balachandru1/registration-app:latest'
+                sh '''
+                docker pull balachandru1/registration-app:latest
+                '''
             }
         }
 
@@ -58,17 +70,19 @@ pipeline {
 
         stage('Verify Running Containers') {
             steps {
-                sh 'docker ps'
+                sh '''
+                docker ps
+                '''
             }
         }
     }
 
     post {
         success {
-            echo '✅ Deployment completed successfully'
+            echo "✅ Deployment successful"
         }
         failure {
-            echo '❌ Deployment failed'
+            echo "❌ Deployment failed - check logs"
         }
     }
 }
