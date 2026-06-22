@@ -2,40 +2,17 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_CONFIG = '/home/ec2-user/.docker'
-        PATH = "/usr/bin:/usr/local/bin:$PATH"
+        PATH = "/usr/bin:/usr/local/bin:/usr/libexec/docker/cli-plugins:$PATH"
     }
 
     stages {
 
-        stage('Clean Workspace') {
-            steps {
-                cleanWs()
-            }
-        }
-
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main', url: 'https://github.com/Balachandru-ai/user-maven.git'
-            }
-        }
-
-        stage('Show Files') {
-            steps {
-                sh '''
-                pwd
-                ls -la
-                ls -la registration-app
-                '''
-            }
-        }
-
         stage('Check Docker') {
             steps {
                 sh '''
+                which docker
                 docker --version
                 docker compose version
-                whoami
                 '''
             }
         }
@@ -44,16 +21,16 @@ pipeline {
             steps {
                 dir('registration-app') {
                     sh '''
-                    docker compose down || true
+                    /usr/bin/docker compose down || true
                     '''
                 }
             }
         }
 
-        stage('Pull Latest Image') {
+        stage('Pull Image') {
             steps {
                 sh '''
-                docker pull balachandru1/registration-app:latest
+                /usr/bin/docker pull balachandru1/registration-app:latest
                 '''
             }
         }
@@ -62,16 +39,16 @@ pipeline {
             steps {
                 dir('registration-app') {
                     sh '''
-                    docker compose up -d
+                    /usr/bin/docker compose up -d
                     '''
                 }
             }
         }
 
-        stage('Verify Running Containers') {
+        stage('Verify') {
             steps {
                 sh '''
-                docker ps
+                /usr/bin/docker ps
                 '''
             }
         }
@@ -82,7 +59,7 @@ pipeline {
             echo "✅ Deployment successful"
         }
         failure {
-            echo "❌ Deployment failed - check logs"
+            echo "❌ Deployment failed"
         }
     }
 }
