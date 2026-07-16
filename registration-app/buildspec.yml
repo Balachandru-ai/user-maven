@@ -3,12 +3,13 @@ version: 0.2
 phases:
   install:
     commands:
-      - echo Installing...
+      - echo "Installing..."
 
   build:
     commands:
+      - cd registration-app
       - mvn clean package
 
 artifacts:
   files:
-    - target/*.jar
+    - registration-app/target/*.jar
